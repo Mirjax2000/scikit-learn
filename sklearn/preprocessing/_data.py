@@ -431,10 +431,13 @@ class MinMaxScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
         "clip": ["boolean"],
     }
 
-    def __init__(self, feature_range=(0, 1), *, copy=True, clip=False):
+    def __init__(
+        self, feature_range=(0, 1), *, log_scaling: bool = False, copy=True, clip=False
+    ):
         self.feature_range = feature_range
         self.copy = copy
         self.clip = clip
+        self.log_scaling = log_scaling
 
     def _reset(self):
         """Reset internal data-dependent state of the scaler, if necessary.
@@ -571,6 +574,8 @@ class MinMaxScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             reset=False,
         )
 
+        if self.log_scaling:
+            X = np.log(X)
         X *= self.scale_
         X += self.min_
         if self.clip:
